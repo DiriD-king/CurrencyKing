@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>International Currencies</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  h1 {
+    text-align: center;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+</style>
+</head>
+<body>
+<h1>Currency of All Nations</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Country</th>
+      <th>Currency</th>
+    </tr>
+  </thead>
+  <tbody id="countryTable">
+    <!-- Data will be inserted here -->
+  </tbody>
+</table>
+
+<script>
+  fetch('https://restcountries.com/v3.1/all')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      const tbody = document.getElementById('countryTable');
+      data.forEach(country => {
+        const row = document.createElement('tr');
+        const countryName = country.name?.common || 'Unknown';
+        const currencies = country.currencies;
+        let currencyNames = [];
+
+        if (currencies && typeof currencies === 'object') {
+          for (const key in currencies) {
+            if (currencies[key]?.name) {
+              currencyNames.push(currencies[key].name);
+            }
+          }
+        }
+        if (currencyNames.length === 0) {
+          currencyNames.push('N/A');
+        }
+
+        row.innerHTML = `
+          <td>${countryName}</td>
+          <td>${currencyNames.join(', ')}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+      document.getElementById('countryTable').innerHTML = '<tr><td colspan="2">Failed to load data.</td></tr>';
+    });
+</script>
+</body>
+</html>
